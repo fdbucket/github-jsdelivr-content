@@ -29,32 +29,28 @@ if (!is_callable('curl_init')) {
     die(json_encode($return));
 }
 
-//必选项
-define("TYPE", "GITHUB"); //选择github
-//define("TYPE","GITEE");//选择gitee，如果使用gitee，需要手动建立master分支，可以看这里 https://gitee.com/help/articles/4122
-
-define("USER", "pic-cdn"); //你的GitHub/Gitee的用户名
-
-define("REPO", "cdn2"); //必须是上面用户名下的 公开仓库
-
-define("MAIL", "yumusb@foxmail.com"); //邮箱无所谓，随便写
-
-define("TOKEN", "213");
+// 必选项
+define("TYPE", "GITHUB"); // 选择GITHUB/GITEE, 选择gitee，如果使用gitee，需要手动建立master分支，可以看这里 https://gitee.com/help/articles/4122
+define("USER", "pic-cdn"); // 你的GitHub/Gitee的用户名
+define("REPO", "cdn2"); // 必须是上面用户名下的 公开仓库
+define("NAME", "游客"); // 提交者显示名字
+define("EMAIL", "user@foxmail.com"); // 提交者邮箱地址，可以是账号绑定邮箱亦可以任意邮箱
+define("TOKEN", "d0d16844-dd7f-49ab-8765-79dc400564b8");
 // Github 去这个页面 https://github.com/settings/tokens生成一个有写权限的token（repo：Full control of private repositories 和write:packages前打勾）
 // gitee  去往这个页面 https://gitee.com/personal_access_tokens
 
-//数据库配置文件
-//请确保把当前目录下的 pic.sql 导入到你的数据库
+// 数据库配置文件
+// 请确保把当前目录下的 pic.sql 导入到你的数据库
 $database = array(
-    'dbname' => 'YourDbName', //你的数据库名字
+    'dbname' => 'YourDbName', // 你的数据库名字
     'host' => 'localhost',
     'port' => 3306,
-    'user' => 'YourDbUser', //你的数据库用户名
-    'pass' => 'YourDbPass', //你的数据库用户名对应的密码
+    'user' => 'YourDbUser', // 你的数据库用户名
+    'pass' => 'YourDbPass', // 你的数据库用户名对应的密码
 );
 
 
-$table = 'remote_imgs'; //表名字
+$table = 'remote_imgs'; // 表名字
 
 if (TYPE !== "GITHUB" && TYPE !== "GITEE") {
     $return['code'] = 500;
@@ -90,26 +86,29 @@ function upload_github($filename, $content)
 {
     $url = "https://api.github.com/repos/" . USER . "/" . REPO . "/contents/" . $filename;
     $ch = curl_init();
-    $defaultOptions = [
+    $defaultOptions = array(
         CURLOPT_URL => $url,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST => "PUT",
-        CURLOPT_POSTFIELDS => json_encode([
-            "message" => "upload By autoPicCdn",
-            "committer" => [
-                "name" => USER,
-                "email" => MAIL,
-            ],
+        CURLOPT_POSTFIELDS => json_encode(array(
+            "message" => "upload By GitHub Jsdelivr Content",
+            "committer" => array(
+                "name" => NAME,
+                "email" => EMAIL,
+            ),
             "content" => $content,
-        ]),
-        CURLOPT_HTTPHEADER => [
-            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language:zh-CN,en-US;q=0.7,en;q=0.3",
-            "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
+        )),
+        CURLOPT_USERAGENT => USER,
+        CURLOPT_HTTPHEADER => array(
+            "Accept: application/vnd.github.v3+json",
+            "User-Agent: " . USER,
+            // "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            // "Accept-Language:zh-CN,en-US;q=0.7,en;q=0.3",
+            // "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
             'Authorization:token ' . TOKEN,
-        ],
-    ];
+        )
+    );
     curl_setopt_array($ch, $defaultOptions);
     $chContents = curl_exec($ch);
     curl_close($ch);
@@ -127,12 +126,12 @@ function upload_gitee($filename, $content)
         CURLOPT_CUSTOMREQUEST => "POST",
         CURLOPT_POSTFIELDS => [
             "access_token" => TOKEN,
-            "message" => "upload By autoPicCdn",
+            "message" => "upload By GitHub Jsdelivr Content",
             "content" => $content,
             "owner" => USER,
             "repo" => REPO,
             "path" => $filename,
-            "branch" => "master"
+            "branch" => "main"
         ],
         CURLOPT_HTTPHEADER => [
             "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
