@@ -1,4 +1,8 @@
 <?php
+if (!defined('IN_SYSTEM')) {
+    exit('Not Found');
+}
+
 // 配置文件
 define('TYPE', 'GITHUB'); // 选择GITHUB/GITEE, 选择gitee，如果使用gitee，需要手动建立master分支，可以看这里 https://gitee.com/help/articles/4122
 define('USER', 'pic-cdn'); // 你的GitHub/Gitee的用户名

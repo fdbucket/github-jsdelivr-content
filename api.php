@@ -17,6 +17,8 @@ URL https://github.com/fdbucket/github-jsdelivr-content
 5. 如果本项目帮助到了您，请鼓励作者 http://33.al/donate ，期待能够带来更好的软件
 */
 
+define('IN_SYSTEM', true);
+
 error_reporting(0);
 header("Content-Type: text/html; charset=UTF-8");
 date_default_timezone_set('PRC');
